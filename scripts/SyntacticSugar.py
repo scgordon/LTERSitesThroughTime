@@ -5,10 +5,10 @@ from contextlib import contextmanager
 import os
 import contextlib
 
-import metadataEvaluation
+import MDeval as md
 
 
-def MDeval(Organization, Collection, Dialect):
+def runMDeval(Organization, Collection, Dialect):
     ''' create a way to go through all of the metadata we want to evaluate
     and transform it into a csv for each site/year combination that exists.
     Two analyses are run, one looks for just Documentation Concepts that have
@@ -21,11 +21,11 @@ def MDeval(Organization, Collection, Dialect):
         Collection + '/' + Dialect + '/xml'
     )
 
-    metadataEvaluation.localAllNodesEval(
+    md.localAllNodesEval(
         MetadataLocation, Organization, Collection, Dialect
     )
 
-    metadataEvaluation.localKnownNodesEval(
+    md.localKnownNodesEval(
         MetadataLocation, Organization, Collection, Dialect
     )
     EvaluatedMetadataDF = pd.read_csv(
@@ -49,7 +49,7 @@ def MDeval(Organization, Collection, Dialect):
             'Attribute Constraints', 'Resource Quality Description'
         ])])
 
-    metadataEvaluation.EvaluatedDatatable(
+    md.EvaluatedDatatable(
         EvaluatedMetadataDF2, DataDestination
     )
 
@@ -84,7 +84,7 @@ def createSiteReport(Organization, Collection, Dialect):
     # read in evaluated xpaths, create xpath occurrence data
     EvaluatedMetadataDF = pd.read_csv(EvaluatedXpaths)
 
-    metadataEvaluation.xpathOccurrence(
+    md.xpathOccurrence(
         EvaluatedMetadataDF, Organization,
         Collection, Dialect, DataDestination
     )
@@ -94,7 +94,7 @@ def createSiteReport(Organization, Collection, Dialect):
         Collection + '_' + Dialect + '_XpathCounts.csv'
     )
 
-    metadataEvaluation.XpathCounts(
+    md.XpathCounts(
         EvaluatedMetadataDF, Organization,
         Collection, Dialect, DataDestination4
     )
@@ -116,7 +116,7 @@ def createSiteReport(Organization, Collection, Dialect):
         Collection + '_' + Dialect + '_ConceptCounts.csv'
     )
 
-    metadataEvaluation.conceptOccurrence(
+    md.conceptOccurrence(
         EvaluatedMetadataDF2, Organization,
         Collection, Dialect, DataDestination2
     )
@@ -148,7 +148,7 @@ def createSiteReport(Organization, Collection, Dialect):
     ConceptOccurrenceDF = ConceptOccurrenceDF.fillna(value=values)
     ConceptOccurrenceDF.to_csv(DataDestination2, mode='w')
 
-    metadataEvaluation.conceptCounts(
+    md.conceptCounts(
         EvaluatedMetadataDF2, Organization,
         Collection, Dialect, DataDestination3
     )
@@ -173,14 +173,14 @@ def createSiteReport(Organization, Collection, Dialect):
         '_' + Collection + '_' + Dialect + '_Report.xlsx'
     )
 
-    metadataEvaluation.collectionSpreadsheet(
+    md.collectionSpreadsheet(
         Organization, Collection, Dialect,
         EvaluatedConcepts, EvaluatedXpaths,
         DataDestination, DataDestination4,
         DataDestination2, DataDestination3, ReportLocation
     )
 
-    # metadataEvaluation.WriteGoogleSheets(ReportLocation)
+    # md.WriteGoogleSheets(ReportLocation)
 
 
 def CombineOrganizationData(Organization):
@@ -208,10 +208,10 @@ def CombineOrganizationData(Organization):
         ConceptOccurrenceList.sort()
 
         # get occurrence percentages for each collection
-        metadataEvaluation.CombineXPathOccurrence(
+        md.CombineXPathOccurrence(
             XPathOccurrenceList, DataDestination
         )
-        metadataEvaluation.CombineConceptOccurrence(
+        md.CombineConceptOccurrence(
             ConceptOccurrenceList, DataDestination3
         )
         ConceptOccurrenceDF = pd.read_csv(DataDestination3, index_col=0)
@@ -249,10 +249,10 @@ def CombineOrganizationData(Organization):
         ConceptCountsList.sort()
 
         # get occurrence percentages for each collection
-        metadataEvaluation.CombineXPathCounts(
+        md.CombineXPathCounts(
             XPathCountsList, DataDestination6
         )
-        metadataEvaluation.CombineConceptCounts(
+        md.CombineConceptCounts(
             ConceptCountsList, DataDestination5
         )
         occurrenceMatrix = pd.read_csv(DataDestination5)
@@ -288,10 +288,10 @@ def CombineOrganizationData(Organization):
         avgConceptOccurrencePerRecordList.sort()
 
         # get occurence per average record
-        metadataEvaluation.CombineAverageXPathOccurrencePerRecord(
+        md.CombineAverageXPathOccurrencePerRecord(
             avgXPathOccurrencePerRecordList, DataDestination2
         )
-        metadataEvaluation.CombineAverageConceptOccurrencePerRecord(
+        md.CombineAverageConceptOccurrencePerRecord(
             avgConceptOccurrencePerRecordList, DataDestination4
         )
 
@@ -314,7 +314,7 @@ def CombineOrganizationData(Organization):
         ConceptOccurrenceDF = ConceptOccurrenceDF.fillna(0.00)
         ConceptOccurrenceDF.to_csv(DataDestination4, mode='w')
 
-        metadataEvaluation.OrganizationSpreadsheet(
+        md.OrganizationSpreadsheet(
             Organization, DataDestination, DataDestination2,
             DataDestination3, DataDestination4,
             ConceptCounts=DataDestination5, xpathCounts=DataDestination6
@@ -324,7 +324,7 @@ def CombineOrganizationData(Organization):
             '../reports/' + Organization + '/' +
             Organization + '_Report.xlsx'
         )
-        metadataEvaluation.WriteGoogleSheets(SpreadsheetLocation)
+        md.WriteGoogleSheets(SpreadsheetLocation)
 
 
 def CombineLTER(DirectoryChoice):
@@ -348,10 +348,10 @@ def CombineLTER(DirectoryChoice):
         )
         ConceptOccurrenceList.sort()
         # get occurrence percentages for each collection
-        metadataEvaluation.CombineXPathOccurrence(
+        md.CombineXPathOccurrence(
             XPathOccurrenceList, DataDestination
         )
-        metadataEvaluation.CombineConceptOccurrence(
+        md.CombineConceptOccurrence(
             ConceptOccurrenceList, DataDestination3
         )
         ConceptOccurrenceDF = pd.read_csv(DataDestination3, index_col=0)
@@ -392,14 +392,14 @@ def CombineLTER(DirectoryChoice):
         avgConceptOccurrencePerRecordList.sort()
 
         # get occurence per average record
-        metadataEvaluation.CombineAverageXPathOccurrencePerRecord(
+        md.CombineAverageXPathOccurrencePerRecord(
             avgXPathOccurrencePerRecordList, DataDestination2
         )
-        metadataEvaluation.CombineAverageConceptOccurrencePerRecord(
+        md.CombineAverageConceptOccurrencePerRecord(
             avgConceptOccurrencePerRecordList, DataDestination4
         )
         Report = 'LTER'
-        metadataEvaluation.OrganizationSpreadsheet(
+        md.OrganizationSpreadsheet(
             Report, DataDestination, DataDestination2,
             DataDestination3, DataDestination4
         )
@@ -407,7 +407,7 @@ def CombineLTER(DirectoryChoice):
         SpreadsheetLocation = (
             '../reports/LTER/LTER_Report.xlsx'
         )
-        #metadataEvaluation.WriteGoogleSheets(SpreadsheetLocation)
+        md.WriteGoogleSheets(SpreadsheetLocation)
 # run workflow for a specific set of metadata collections
 # files that drive the script
 
@@ -419,7 +419,7 @@ ListofOrganizations = "./ListOfOrganizations.csv"
 with open(ListofCollections, "r") as f:
     reader = csv.reader(f, delimiter=",")
     for row in enumerate(reader):
-        MDeval(*row[1])
+        runMDeval(*row[1])
 
 # create reports from transformed metadata
 with open(ListofCollections, "r") as f:
